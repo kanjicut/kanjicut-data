@@ -1,0 +1,1 @@
+# Scrapes the JPDB keyword from each of their kanji.
