@@ -2,15 +2,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-from unittest import skip
 import requests
 import zipfile
 import io
 import os
+import json
 
 from utils import is_valid_kanji
 
 KANJIVG_LATEST_RELEASE = "https://api.github.com/repos/KanjiVG/kanjivg/releases/latest"
+KANJIVG_HEX_PADDING = 5
+KANJIVG_HEX_PADDING_CHAR = "0"
 
 def get_kvg_index() -> dict[str, list[str]] | None:
     """
@@ -75,7 +77,7 @@ def unicode_to_hex(kanji_char: str):
     
     code_point = ord(kanji_char)
     raw_hex = format(code_point, "x")
-    padded_hex = raw_hex.rjust(5, "0")
+    padded_hex = raw_hex.rjust(KANJIVG_HEX_PADDING, KANJIVG_HEX_PADDING_CHAR)
 
     return padded_hex.lower()
 
@@ -108,7 +110,7 @@ def main():
     with kvg_zip as zip:
         for file_path in zip.namelist():
             # 5 digit hex
-            if len(file_path) != len("kanji/") + 5 + len(".svg"):
+            if len(file_path) != len("kanji/") + KANJIVG_HEX_PADDING + len(".svg"):
                 continue
 
             svg_file = zip.open(file_path)
@@ -128,9 +130,18 @@ def main():
 
             contents = svg_file.read()
 
-            # json = open(path, "a")
-            # json.write(contents)
-            # json.close()
+            json_file = open(path, "r+")
+
+            data = json.load(json_file)
+
+            print(contents)
+            data["svg"] = {contents}
+
+            json_file.seek(0)
+            json.dump(data, json_file, indent=4)
+
+            json_file.close()
+            svg_file.close()
 
 if __name__ == "__main__":
     main()

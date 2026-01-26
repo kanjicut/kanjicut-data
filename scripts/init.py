@@ -4,9 +4,26 @@
 
 import os
 import requests
+import json
 
-from kanjivg import get_kvg_index
+from kanjivg import get_kvg_index, unicode_to_hex
 from utils import is_valid_kanji
+
+JSON_FORMAT = {
+    "kanji": "",
+    "hexadecimal": "",
+    "jpdb_keyword": "",
+    "rtk_keyword": "",
+    "kklc_keyword": "",
+    "frequency": 0,
+    "jouyou_level": "",
+    "JLPT": "",
+    "onyomi": [],
+    "kunyomi": [],
+    "components": [],
+    "strokes": 0,
+    "svg": {},
+}
 
 def main():
     """
@@ -30,10 +47,21 @@ def main():
     kvg_index = get_kvg_index()
 
     for kanji in kvg_index:
-
         if is_valid_kanji(kanji):
             try:
-                open(f"./data/kanji/{kanji}.json", "x")
+                hex = unicode_to_hex(kanji)
+
+                data = JSON_FORMAT.copy()
+                data["kanji"] = kanji
+                data["hexadecimal"] = hex
+                
+                file = open(f"./data/kanji/{kanji}.json", "w", encoding="utf-8")
+                file.seek(0)
+
+                json.dump(data, file, indent=4)
+
+                file.close()
+                
             except FileExistsError:
                 print(f"{kanji}.json already exists and was not created.")
             except:
