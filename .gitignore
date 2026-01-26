@@ -3,6 +3,4 @@ __pycache__
 env
 meta.json
 
-.venv/
-
 docs/build/

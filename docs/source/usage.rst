@@ -1,1 +1,1 @@
-.. autofunction:: init.is_valid_kanji()
+.. autofunction:: utils.is_valid_kanji()
