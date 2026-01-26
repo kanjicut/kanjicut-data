@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 # Run this script to create the initial JSON files for each kanji. 
 # Kanji are sourced from KanjiVG at https://github.com/KanjiVG/kanjivg
 

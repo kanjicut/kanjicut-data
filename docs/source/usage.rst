@@ -1,0 +1,1 @@
+.. autofunction:: init.is_valid_kanji()
