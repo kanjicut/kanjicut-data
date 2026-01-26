@@ -1,0 +1,1 @@
+See the [docs](https://docs-data.kanjicut.com/) for more information.
