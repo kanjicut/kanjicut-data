@@ -1,0 +1,90 @@
+name: Monthly Release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  kanjivg:
+     uses: ./.github/workflows/kanjivg.yml
+
+  check-changes:
+    needs: kanjivg
+    runs-on: ubuntu-latest
+
+    outputs:
+      proceed: ${{ steps.set-proceed.outputs.proceed }}
+
+    steps:
+      - name: Determine whether to proceed
+        id: set-proceed
+        if: ${{ needs.kanjivg.outputs.changes == 'true' }}
+        run: |
+          if [ "${{ needs.kanjivg.outputs.changes }}" = "true" ]; then
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          fi
+
+  create-zip:
+    if: ${{ needs.check-changes.outputs.proceed == 'true' }}
+    needs: check-changes
+    runs-on: ubuntu-latest
+    
+    steps:  
+      - name: Checkout branch tip
+        uses: actions/checkout@v6
+        with:
+          ref: 'main'
+          fetch-depth: 0
+
+      - name: Build data
+        run: zip -r "kanjicut-data-all.zip" ./data
+      
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kanjicut-data-all
+          path: kanjicut-data-all.zip
+
+  create-release:
+    if: ${{ needs.check-changes.outputs.proceed == 'true' }}
+    needs: create-zip
+    runs-on: ubuntu-latest
+
+    steps:  
+      - uses: actions/download-artifact@v5
+
+      - name: Get date
+        run: echo "DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: 'v${{ env.DATE }}'
+          release_name: 'v${{ env.DATE }}'
+          body: 'Monthly automatic KanjiCut data release.'
+          
+      - name: Upload release asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./kanjicut-data-all.zip
+          asset_name: kanjicut-data-all-${{ env.DATE }}.zip
+          asset_content_type: application/zip
+
+
+
+
+      
+    
