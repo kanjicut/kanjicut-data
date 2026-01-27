@@ -6,6 +6,10 @@ permissions:
 on:
   workflow_dispatch:
   workflow_call:
+    outputs:
+        changes:
+          description: "If any data changes were made."
+          value: ${{ jobs.update.outputs.output1 }}
 
 jobs:
   update:
