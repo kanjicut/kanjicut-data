@@ -8,7 +8,7 @@ import io
 import os
 import json
 
-from utils import is_valid_kanji
+from utils import is_valid_kanji, read_JSON, write_JSON
 
 KANJIVG_LATEST_RELEASE = "https://api.github.com/repos/KanjiVG/kanjivg/releases/latest"
 KANJIVG_HEX_PADDING = 5
@@ -108,40 +108,26 @@ def main():
         return
 
     with kvg_zip as zip:
-        for file_path in zip.namelist():
-            # 5 digit hex
-            if len(file_path) != len("kanji/") + KANJIVG_HEX_PADDING + len(".svg"):
+        zip_paths = zip.namelist()
+
+        for path in os.scandir("./data/kanji/"):
+            data = read_JSON(path)
+
+            hex = data["hexadecimal"]
+
+            svg_path = f"kanji/{hex}.svg"
+
+            if not svg_path in zip_paths:
+                print(f"Could not find {svg_path}.")
                 continue
 
-            svg_file = zip.open(file_path)
-
-            kanji_hex = svg_file.name.removeprefix("kanji/").removesuffix(".svg")
-            kanji = hex_to_unicode(kanji_hex)
-
-            if not kanji:
-                continue
-            
-            path = f"./data/kanji/{kanji}.json"
-
-            if not os.path.exists(path):
-                print(f"Could not find {kanji}.json, closing the file and continuing.")
-                svg_file.close()
-                continue
-
+            svg_file = zip.open(svg_path)
             contents = svg_file.read()
-
-            json_file = open(path, "r+")
-
-            data = json.load(json_file)
-
-            print(contents)
-            data["svg"] = {contents}
-
-            json_file.seek(0)
-            json.dump(data, json_file, indent=4)
-
-            json_file.close()
             svg_file.close()
+
+            data["svg"] = contents
+
+            write_JSON(path, data)
 
 if __name__ == "__main__":
     main()

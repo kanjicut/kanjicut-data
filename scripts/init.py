@@ -22,7 +22,7 @@ JSON_FORMAT = {
     "kunyomi": [],
     "components": [],
     "strokes": 0,
-    "svg": {},
+    "svg": "",
 }
 
 def main():
@@ -55,7 +55,7 @@ def main():
                 data["kanji"] = kanji
                 data["hexadecimal"] = hex
                 
-                file = open(f"./data/kanji/{kanji}.json", "w", encoding="utf-8")
+                file = open(f"./data/kanji/{hex}.json", "w", encoding="utf-8")
                 file.seek(0)
 
                 json.dump(data, file, indent=4)

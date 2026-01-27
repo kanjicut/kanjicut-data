@@ -1,4 +1,16 @@
 import re
+import json
+
+def read_JSON(path: str):
+    with open(path, "r", encoding="utf-8") as file:
+         data = json.load(file)
+
+         return data
+
+def write_JSON(path: str, data: object) -> bool:
+    with open(path, "w", encoding="utf-8") as file:
+        file.seek(0)
+        json.dump(data, file, indent=4)
 
 def is_valid_kanji(kanji: str):
     """
