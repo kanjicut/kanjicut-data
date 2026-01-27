@@ -12,11 +12,11 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Call KanjiVG
-        uses: ./.github/workflows/kanjivg.yml
-        
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Call KanjiVG
+        uses: ./.github/workflows/kanjivg.yml
         
       - name: Build Data
         run: |
