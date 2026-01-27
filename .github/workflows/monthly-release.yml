@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *'
-    
+
 jobs:
   kanjivg:
      uses: ./.github/workflows/kanjivg.yml
@@ -15,15 +15,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: kanjivg
     steps:
+      - env:
+          KANJIVG: ${{needs.kanjivg.outputs.changes}}
+          EXIT: False
+        run: echo "$OUTPUT1 $OUTPUT2"
+          
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check For Changes
+        id: changes
+        if: ${{ !env.KANJIVG }}
+        run: |
+          echo "env.EXIT=true" >> $GITHUB_OUTPUT
+        
         
       - name: Build Data
+        if: ${{!env.EXIT}}
         run: |
           zip -r "kanjicut-data-${{ github.run_number }}.zip" ./data
           
       - name: Create Release
         id: create_release
+        if: ${{!env.EXIT}}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,6 +48,7 @@ jobs:
           
       - name: Upload Release Asset
         id: upload-release-asset 
+        if: ${{!env.EXIT}}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
