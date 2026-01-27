@@ -7,40 +7,58 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *'
-    
+
 jobs:
+  kanjivg:
+     uses: ./.github/workflows/kanjivg.yml
   create-release:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    needs: kanjivg
+    steps:  
+      - name: Set Exit False
+        run: echo "exit=false" >> $GITHUB_ENV
         
-      - name: Call KanjiVG
-        uses: ./.github/workflows/kanjivg.yml
+      - name: Check For Changes
+        id: changes
+        if: ${{ !needs.kanjivg.outputs.changes }}
+        run: |
+          echo "exit=true" >> $GITHUB_ENV
+    
+      - name: Checkout
+        if: ${{ !env.exit }}
+        uses: actions/checkout@v4
+
+      - name: Get Date
+        if: ${{ !env.exit }}
+        run: |
+          echo "date=$('%d-%m-%y')" >> $GITHUB_ENV
         
       - name: Build Data
+        if: ${{ !env.exit }}
         run: |
-          zip -r "kanjicut-data-${{ github.run_number }}.zip" ./data
+          zip -r "kanjicut-data-${{ env.date }}.zip" ./data
           
       - name: Create Release
         id: create_release
+        if: ${{ !env.exit }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'v${{ github.run_number }}'
-          release_name: 'v${{ github.run_number }}'
+          tag_name: 'v${{ env.date }}'
+          release_name: 'v${{ env.date }}'
           body: 'Description of the changes in this release'
           
       - name: Upload Release Asset
         id: upload-release-asset 
+        if: ${{ !env.exit }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kanjicut-data-${{ github.run_number }}.zip
-          asset_name: kanjicut-data-${{ github.run_number }}.zip
+          asset_path: ./kanjicut-data-all-${{ env.date }}.zip
+          asset_name: kanjicut-data-all-${{ env.date }}.zip
           asset_content_type: application/zip
 
 
