@@ -122,12 +122,16 @@ def main():
                 continue
 
             svg_file = zip.open(svg_path)
-            contents = svg_file.read()
+            contents = svg_file.read().decode("utf-8").strip()
             svg_file.close()
 
             data["svg"] = contents
 
+            print(contents)
+
             write_JSON(path, data)
+
+            break
 
 if __name__ == "__main__":
     main()
