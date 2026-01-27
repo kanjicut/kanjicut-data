@@ -121,6 +121,8 @@ def main():
                 print(f"Could not find {svg_path}.")
                 continue
 
+            print(f"Adding SVG to {path}.")
+
             svg_file = zip.open(svg_path)
             contents = svg_file.read().decode("utf-8").strip()
             svg_file.close()
