@@ -127,11 +127,7 @@ def main():
 
             data["svg"] = contents
 
-            print(contents)
-
             write_JSON(path, data)
-
-            break
 
 if __name__ == "__main__":
     main()
