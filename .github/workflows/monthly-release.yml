@@ -13,6 +13,7 @@ jobs:
         uses: codex-/return-dispatch@v2
         id: kanjivg_dispatch
         with:
+          token: ${{ github.token }}
           repo: kanjicut-data
           owner: kanjicut
           workflow: update-kanjivg-svgs.yml
@@ -20,6 +21,7 @@ jobs:
       - name: Await Run ID ${{ steps.kanjivg_dispatch.outputs.run_id }}
         uses: Codex-/await-remote-run@v1
         with:
+          token: ${{ github.token }}
           repo: kanjicut-data
           owner: kanjicut
           run_id: ${{ steps.kanjivg_dispatch.outputs.run_id }}
