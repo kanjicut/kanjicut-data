@@ -9,14 +9,14 @@ on:
     - cron: '0 0 1 * *'
     
 jobs:
+  kanjivg:
+     uses: ./.github/workflows/kanjivg.yml
   create-release:
     runs-on: ubuntu-latest
+    needs: kanjivg
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Call KanjiVG
-        uses: ./.github/workflows/kanjivg.yml
         
       - name: Build Data
         run: |
