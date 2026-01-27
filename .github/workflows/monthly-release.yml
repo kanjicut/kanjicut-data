@@ -9,19 +9,18 @@ on:
     - cron: '0 0 1 * *'
     
 jobs:
-  call-kanjivg:
-    uses: ./.github/workflows/kanjivg.yml
   create-release:
     runs-on: ubuntu-latest
     steps:
+      - name: Call KanjiVG
+        uses: ./.github/workflows/kanjivg.yml
+        
       - name: Checkout
         uses: actions/checkout@v4
         
       - name: Build Data
         run: |
-          ls
-          now=$(date +"%d%m%Y")
-          zip -r "kanjicut-data-$(date +"%d-%m-%Y").zip" ./data
+          zip -r "kanjicut-data-${{ github.run_number }}.zip" ./data
           
       - name: Create Release
         id: create_release
@@ -40,8 +39,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kanjicut-data-$(date +"%d-%m-%Y").zip
-          asset_name: kanjicut-data-$(date +"%d-%m-%Y").zip
+          asset_path: ./kanjicut-data-${{ github.run_number }}.zip
+          asset_name: kanjicut-data-${{ github.run_number }}.zip
           asset_content_type: application/zip
 
 
