@@ -6,42 +6,50 @@ on:
     - cron: '0 0 1 * *'
     
 jobs:
-  release:
+  call-kanjivg:
+    uses: ./.github/workflows/kanjivg.yml
+  create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Dispatch KanjiVG Workflow
-        uses: codex-/return-dispatch@v2
-        id: kanjivg_dispatch
-        with:
-          token: ${{ github.token }}
-          repo: kanjicut-data
-          owner: kanjicut
-          workflow: update-kanjivg-svgs.yml
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Build Data
+        run: |
+          cd ../
+          now=$(date +"%d%m%Y")
+          zip -r "kanjicut-data-$(date +"%d-%m-%Y").zip" ./data
+
+      - name: Create Tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ github.run_number }}" -m "Release v${{ github.run_number }}"
+          git push origin "v${{ github.run_number }}"
           
-      - name: Await Run ID ${{ steps.kanjivg_dispatch.outputs.run_id }}
-        uses: Codex-/await-remote-run@v1
-        with:
-          token: ${{ github.token }}
-          repo: kanjicut-data
-          owner: kanjicut
-          run_id: ${{ steps.kanjivg_dispatch.outputs.run_id }}
-          poll_interval_ms: 5000
-
-      - name: Compress Data
-        uses: somaz94/compress-decompress@v1
-        with:
-          command: compress
-          source: ./data
-          format: zip
-          dest: './release'
-          destfilename: 'kanjicut-data'
-
       - name: Create Release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          automatic_release_tag: "latest"
-          files: ./release/kanjicut-data.zip
+          tag_name: 'v${{ github.run_number }}'
+          release_name: 'v${{ github.run_number }}'
+          body: 'Description of the changes in this release'
+          
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./kanjicut-data-$(date +"%d-%m-%Y").zip
+          asset_name: kanjicut-data-$(date +"%d-%m-%Y").zip
+          asset_content_type: application/zip
+
+
+
+
+      
+    
