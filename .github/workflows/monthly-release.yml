@@ -27,7 +27,7 @@ jobs:
         id: changes
         if: ${{ !env.KANJIVG }}
         run: |
-          echo "env.EXIT=true" >> $GITHUB_OUTPUT
+          echo "EXIT=true" >> $GITHUB_OUTPUT
         
         
       - name: Build Data
