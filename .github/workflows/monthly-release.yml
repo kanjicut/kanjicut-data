@@ -18,7 +18,6 @@ jobs:
       - env:
           KANJIVG: ${{needs.kanjivg.outputs.changes}}
           EXIT: False
-          DATE: ""
         run: echo "$OUTPUT1 $OUTPUT2"
           
       - name: Checkout
@@ -26,41 +25,41 @@ jobs:
 
       - name: Check For Changes
         id: changes
-        if: ${{ !env.KANJIVG }}
+        if: !$KANJIVG
         run: |
-          echo "EXIT=true" >> $GITHUB_OUTPUT
+          echo "EXIT=true" >> $GITHUB_ENV
 
       - name: Get Date
-        if: ${{!env.EXIT}}
+        if: !$EXIT
         run: |
-          echo "DATE=$('%d-%m-%y')" >> $GITHUB_OUTPUT
+          echo "DATE=$('%d-%m-%y')" >> $GITHUB_ENV
         
       - name: Build Data
-        if: ${{!env.EXIT}}
+        if: !$EXIT
         run: |
-          zip -r "kanjicut-data-${{ env.DATE }}.zip" ./data
+          zip -r "kanjicut-data-$DATE.zip" ./data
           
       - name: Create Release
         id: create_release
-        if: ${{!env.EXIT}}
+        if: !$EXIT
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'v${{ env.DATE }}'
-          release_name: 'v${{ env.DATE }}'
+          tag_name: 'v$DATE'
+          release_name: 'v$DATE'
           body: 'Description of the changes in this release'
           
       - name: Upload Release Asset
         id: upload-release-asset 
-        if: ${{!env.EXIT}}
+        if: !$EXIT
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kanjicut-data-all-${{ env.DATE }}.zip
-          asset_name: kanjicut-data-all-${{ env.DATE }}.zip
+          asset_path: ./kanjicut-data-all-$DATE.zip
+          asset_name: kanjicut-data-all-$DATE.zip
           asset_content_type: application/zip
 
 
