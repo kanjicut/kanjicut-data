@@ -19,7 +19,7 @@ jobs:
         
       - name: Build Data
         run: |
-          cd ../
+          ls
           now=$(date +"%d%m%Y")
           zip -r "kanjicut-data-$(date +"%d-%m-%Y").zip" ./data
           
