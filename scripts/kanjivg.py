@@ -111,6 +111,8 @@ def main():
         zip_paths = zip.namelist()
 
         for path in os.scandir("./data/kanji/"):
+            print(f"Adding SVG to {path}.")
+
             data = read_JSON(path)
 
             hex = data["hexadecimal"]
@@ -120,8 +122,6 @@ def main():
             if not svg_path in zip_paths:
                 print(f"Could not find {svg_path}.")
                 continue
-
-            print(f"Adding SVG to {path}.")
 
             svg_file = zip.open(svg_path)
             contents = svg_file.read().decode("utf-8").strip()
