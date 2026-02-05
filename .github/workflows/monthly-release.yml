@@ -18,45 +18,48 @@ jobs:
     steps:  
       - run: echo ${{ needs.kanjivg.outputs.changes }}
 
-      - name: Set Proceed True
+      - name: Set Proceed to False
         run: |
-          echo "proceed=${{ needs.kanjivg.outputs.changes }}" >> $GITHUB_ENV
+          echo "PROCEED=false" >> $GITHUB_ENV
+
+      - name: Check For Data Changes
+        run: |
+          echo "PROCEED=${{ needs.kanjivg.outputs.changes }}" >> $GITHUB_ENV
  
       - name: Checkout
-        if: ${{ env.proceed }}
+        if: ${{ env.PROCEED }}
         uses: actions/checkout@v4
 
       - name: Get Date
-        if: ${{ env.proceed }}
+        if: ${{ env.PROCEED }}
         run: |
           echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-          echo $DATE
         
       - name: Build Data
-        if: ${{ env.proceed }}
+        if: ${{ env.PROCEED }}
         run: |
-          zip -r "kanjicut-data-all-$DATE.zip" ./data
+          zip -r "kanjicut-data-all.zip" ./data
           
       - name: Create Release
         id: create_release
-        if: ${{ env.proceed }}
+        if: ${{ env.PROCEED }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: 'v${{ env.DATE }}'
           release_name: 'v${{ env.DATE }}'
-          body: 'Description of the changes in this release'
+          body: 'Monthly automatic KanjiCut data release.'
           
       - name: Upload Release Asset
         id: upload-release-asset 
-        if: ${{ env.proceed }}
+        if: ${{ env.PROCEED }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kanjicut-data-all-${{ env.DATE }}.zip
+          asset_path: ./kanjicut-data-all.zip
           asset_name: kanjicut-data-all-${{ env.DATE }}.zip
           asset_content_type: application/zip
 
