@@ -16,8 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: kanjivg
     steps:  
-      - run: echo ${{ needs.kanjivg.outputs.changes }}
-
       - name: Set Proceed to False
         run: |
           echo "PROCEED=false" >> $GITHUB_ENV
