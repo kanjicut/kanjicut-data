@@ -11,10 +11,13 @@ on:
 jobs:
   kanjivg:
      uses: ./.github/workflows/kanjivg.yml
+
   create-release:
     runs-on: ubuntu-latest
     needs: kanjivg
     steps:  
+      - run: echo ${{ needs.kanjivg.outputs.changes }}
+
       - name: Set Exit False
         run: echo "exit=false" >> $GITHUB_ENV
         

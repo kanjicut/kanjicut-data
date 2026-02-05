@@ -8,7 +8,7 @@ on:
   workflow_call:
     outputs:
         changes:
-          description: "If any data changes were made."
+          description: "If any data changes were made"
           value: ${{ jobs.update.outputs.output1 }}
 
 jobs:
