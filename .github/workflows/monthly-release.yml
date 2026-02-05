@@ -29,12 +29,13 @@ jobs:
       - name: Get Date
         if: ${{ env.proceed }}
         run: |
-          echo "date=$('%d-%m-%y')" >> $GITHUB_ENV
+          echo "date=$(date + '%d-%m-%y')" >> $GITHUB_ENV
+          echo ${{ env.date }}
         
       - name: Build Data
         if: ${{ env.proceed }}
         run: |
-          zip -r "kanjicut-data-${{ env.date }}.zip" ./data
+          zip -r "kanjicut-data-all-${{ env.date }}.zip" ./data
           
       - name: Create Release
         id: create_release
