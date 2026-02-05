@@ -29,7 +29,7 @@ jobs:
       - name: Get Date
         if: ${{ env.proceed }}
         run: |
-          run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
           echo $DATE
         
       - name: Build Data
