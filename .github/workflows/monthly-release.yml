@@ -18,14 +18,14 @@ jobs:
     steps:  
       - run: echo ${{ needs.kanjivg.outputs.changes }}
 
-      - name: Set Exit False
-        run: echo "exit=false" >> $GITHUB_ENV
+      - name: Set Exit True
+        run: echo "exit=true" >> $GITHUB_ENV
         
       - name: Check For Changes
         id: changes
-        if: ${{ !needs.kanjivg.outputs.changes }}
+        if: ${{ needs.kanjivg.outputs.changes }}
         run: |
-          echo "exit=true" >> $GITHUB_ENV
+          echo "exit=false" >> $GITHUB_ENV
     
       - name: Checkout
         if: ${{ !env.exit }}
