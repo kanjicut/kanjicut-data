@@ -29,13 +29,13 @@ jobs:
       - name: Get Date
         if: ${{ env.proceed }}
         run: |
-          echo "date=$(date + '%d-%m-%y')" >> $GITHUB_ENV
-          echo ${{ env.date }}
+          run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          echo $DATE
         
       - name: Build Data
         if: ${{ env.proceed }}
         run: |
-          zip -r "kanjicut-data-all-${{ env.date }}.zip" ./data
+          zip -r "kanjicut-data-all-$DATE.zip" ./data
           
       - name: Create Release
         id: create_release
@@ -44,8 +44,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'v${{ env.date }}'
-          release_name: 'v${{ env.date }}'
+          tag_name: 'v${{ env.DATE }}'
+          release_name: 'v${{ env.DATE }}'
           body: 'Description of the changes in this release'
           
       - name: Upload Release Asset
@@ -56,8 +56,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kanjicut-data-all-${{ env.date }}.zip
-          asset_name: kanjicut-data-all-${{ env.date }}.zip
+          asset_path: ./kanjicut-data-all-${{ env.DATE }}.zip
+          asset_name: kanjicut-data-all-${{ env.DATE }}.zip
           asset_content_type: application/zip
 
 
