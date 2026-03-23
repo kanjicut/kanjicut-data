@@ -25,6 +25,7 @@ JSON_FORMAT = {
     "svg": "",
 }
 
+
 def main():
     """
     Creates the initial JSON files for each kanji.
@@ -61,11 +62,9 @@ def main():
                 json.dump(data, file, indent=4)
 
                 file.close()
-                
             except FileExistsError:
                 print(f"{kanji}.json already exists and was not created.")
-            except:
-                print(f"Error when creating {kanji}.json.")
+
 
 if __name__ == "__main__":
     main()

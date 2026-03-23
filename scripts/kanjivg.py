@@ -6,13 +6,13 @@ import requests
 import zipfile
 import io
 import os
-import json
 
 from utils import is_valid_kanji, read_JSON, write_JSON
 
 KANJIVG_LATEST_RELEASE = "https://api.github.com/repos/KanjiVG/kanjivg/releases/latest"
 KANJIVG_HEX_PADDING = 5
 KANJIVG_HEX_PADDING_CHAR = "0"
+
 
 def get_kvg_index() -> dict[str, list[str]] | None:
     """
@@ -29,6 +29,7 @@ def get_kvg_index() -> dict[str, list[str]] | None:
         return
     
     return response.json()
+
 
 def get_latest_kvg_release() -> zipfile.ZipFile | None:
     """
@@ -60,7 +61,8 @@ def get_latest_kvg_release() -> zipfile.ZipFile | None:
 
     return zipfile.ZipFile(io.BytesIO(response.content))
 
-def unicode_to_hex(kanji_char: str):
+
+def unicode_to_hex(kanji_char: str) -> str:
     """
     Converts a unicode kanji to a hexadecimal string as specified by KanjiVG.    
 
@@ -81,7 +83,8 @@ def unicode_to_hex(kanji_char: str):
 
     return padded_hex.lower()
 
-def hex_to_unicode(kanji_hex: str):
+
+def hex_to_unicode(kanji_hex: str) -> str:
     """
     Converts a hexadecimal string to a unicode kanji character.    
 
@@ -100,7 +103,8 @@ def hex_to_unicode(kanji_hex: str):
         return
 
     return kanji_char
-                  
+
+
 def main():
     kvg_zip = get_latest_kvg_release()
 
@@ -113,11 +117,11 @@ def main():
         for path in os.scandir("./data/kanji/"):
             data = read_JSON(path)
 
-            hex = data["hexadecimal"]
+            hexa = data["hexadecimal"]
 
-            svg_path = f"kanji/{hex}.svg"
+            svg_path = f"kanji/{hexa}.svg"
 
-            if not svg_path in zip_paths:
+            if svg_path not in zip_paths:
                 print(f"Could not find {svg_path}.")
                 continue
 
@@ -130,6 +134,7 @@ def main():
             data["svg"] = contents
 
             write_JSON(path, data)
+
 
 if __name__ == "__main__":
     main()
